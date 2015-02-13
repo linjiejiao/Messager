@@ -1,16 +1,22 @@
 
 package cn.ljj.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import cn.ljj.message.ComposerParser;
+import java.util.Arrays;
+
 import cn.ljj.message.IPMessage;
 import cn.ljj.message.Headers;
+import cn.ljj.message.composerparser.MessageComposer;
+import cn.ljj.message.composerparser.MessageParser;
+import cn.ljj.message.composerparser.UserComposer;
+import cn.ljj.message.composerparser.UserParser;
+import cn.ljj.messager.R;
 import cn.ljj.user.User;
-import ljj.test.R;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
@@ -38,6 +44,32 @@ public class MainActivity extends Activity {
         editContent = (EditText) findViewById(R.id.edit_msg);
         editTo = (EditText) findViewById(R.id.edit_to);
         textRecv = (TextView) findViewById(R.id.text_recv);
+        IPMessage msg = new IPMessage();
+
+        user = new User();
+        user.setName("userName");
+        user.setIdentity("1234567890");
+        user.setmPassword("123456789");
+        msg.setBody(UserComposer.composeUser(user));
+        msg.setDate("date");
+        msg.setFrom("name");
+        msg.setTo("host");
+        msg.setMessageIndex(128);
+        msg.setMessageType(Headers.MESSAGE_TYPE_LOGIN);
+        try {
+            Log.e(TAG, "before:" + msg);
+            Log.e(TAG, "before:" + user);
+            byte[] data = MessageComposer.composeMessage(msg);
+            msg = MessageParser.parseMessage(new ByteArrayInputStream(data));
+            Log.e(TAG, "after:" + msg);
+            Log.e(TAG, "after:" + UserParser.parseUser(msg.getBody()));
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
+        
+        
         btn_login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,15 +79,22 @@ public class MainActivity extends Activity {
                 user.setIdentity("1234567890");
                 user.setmPassword("123456789");
 
-                msg.setBody(ComposerParser.composeUser(user));
+                msg.setBody(UserComposer.composeUser(user));
                 msg.setDate("date");
                 msg.setFrom(user.getName());
                 msg.setTo("host");
                 msg.setMessageIndex(1);
                 msg.setMessageType(Headers.MESSAGE_TYPE_LOGIN);
                 try {
+                    Log.e(TAG, "before:" + msg);
+                    Log.e(TAG, "after:" + MessageParser.parseMessage(new ByteArrayInputStream(MessageComposer.composeMessage(msg))));
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                try {
                     ops.write("abcdefg".getBytes());
-                    ops.write(ComposerParser.composeMessage(msg));
+                    ops.write(MessageComposer.composeMessage(msg));
                 } catch (IOException e) {
                     e.printStackTrace();
                     new Thread(mClientThread).start();
@@ -78,7 +117,7 @@ public class MainActivity extends Activity {
                 msg.setMessageType(Headers.MESSAGE_TYPE_MESSAGE);
                 try {
                     ops.write("abcdefg".getBytes());
-                    ops.write(ComposerParser.composeMessage(msg));
+                    ops.write(MessageComposer.composeMessage(msg));
                 } catch (IOException e) {
                     e.printStackTrace();
                     new Thread(mClientThread).start();
@@ -113,7 +152,7 @@ public class MainActivity extends Activity {
             try {
                 Log.e(TAG, "ReceiverThread run");
                 while (true) {
-                    IPMessage msg = ComposerParser.parseMessage(ips);
+                    IPMessage msg = MessageParser.parseMessage(ips);
                     if(msg != null){
                         final String content = new String(msg.getBody());
                         runOnUiThread(new Runnable() {

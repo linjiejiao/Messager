@@ -9,17 +9,8 @@ import cn.ljj.message.Headers;
 
 public class MessageComposer extends BaseComposer {
 
-    public byte[] composeMessage(IPMessage msg) throws IOException {
+    public static byte[] composeMessage(IPMessage msg) throws IOException {
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        for(int i : Headers.BYTE_HEADERS){
-            byte[] data = getByteArrayData(msg, i);
-            if(data == null){
-                continue;
-            }
-            byte[] buffer = composeByteArray(data);
-            bao.write(i);
-            bao.write(buffer);
-        }
         for(int i : Headers.INT_HEADERS){
             Integer data = getIntData(msg, i);
             if(data == null){
@@ -36,6 +27,17 @@ public class MessageComposer extends BaseComposer {
             }
             byte[] buffer = composeString(data);
             bao.write(i);
+            bao.write(getLengthBytes(buffer.length));
+            bao.write(buffer);
+        }
+        for(int i : Headers.BYTE_HEADERS){
+            byte[] data = getByteArrayData(msg, i);
+            if(data == null){
+                continue;
+            }
+            byte[] buffer = composeByteArray(data);
+            bao.write(i);
+            bao.write(getLengthBytes(buffer.length));
             bao.write(buffer);
         }
         byte[] data = bao.toByteArray();
@@ -43,7 +45,7 @@ public class MessageComposer extends BaseComposer {
         // header for whole message
         bao = new ByteArrayOutputStream();
         bao.write(Headers.MESSAGE_BEGIN);
-        bao.write(getLengthBytes(data.length));
+        bao.write(getLengthBytes(data.length + 1)); // Headers.MESSAGE_END
         bao.write(data);
         bao.write(Headers.MESSAGE_END);
         return bao.toByteArray();

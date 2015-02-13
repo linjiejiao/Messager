@@ -39,4 +39,16 @@ public class InputStreamReader {
     public void resetIndex() {
         mIndex = 0;
     }
+
+    public boolean close(){
+        if(mDataStream != null){
+            try {
+                mDataStream.close();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
 }

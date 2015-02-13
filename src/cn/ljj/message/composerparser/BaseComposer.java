@@ -37,7 +37,7 @@ public class BaseComposer {
         return ret;
     }
 
-    protected static int getLengthSize(long length) {
+    protected static int getLengthSize(int length) {
         int i;
         long max = 127;
         for (i = 0; i < 5; i++) {
@@ -49,7 +49,7 @@ public class BaseComposer {
         return i;
     }
 
-    protected static byte[] getLengthBytes(long length) {
+    protected static byte[] getLengthBytes(int length) {
         int i = getLengthSize(length);
         int j = i;
         byte[] bytes = new byte[j + 1];
@@ -63,9 +63,9 @@ public class BaseComposer {
         return bytes;
     }
 
-    protected static byte[] getIntBytes(long value) {
+    protected static byte[] getIntBytes(int value) {
         byte[] bytes = new byte[4];
-        for (int i = 0; i < 4; i++) {
+        for (int i = 3; i >= 0; i--) { // DESC
             bytes[i] = (byte) (value & 0xff);
             value = value >> 8;
         }
