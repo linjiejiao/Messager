@@ -1,26 +1,21 @@
 
 package cn.ljj.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
-
 import cn.ljj.message.IPMessage;
 import cn.ljj.message.Headers;
 import cn.ljj.message.composerparser.MessageComposer;
 import cn.ljj.message.composerparser.MessageParser;
 import cn.ljj.message.composerparser.UserComposer;
-import cn.ljj.message.composerparser.UserParser;
 import cn.ljj.messager.R;
 import cn.ljj.user.User;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -44,32 +39,7 @@ public class MainActivity extends Activity {
         editContent = (EditText) findViewById(R.id.edit_msg);
         editTo = (EditText) findViewById(R.id.edit_to);
         textRecv = (TextView) findViewById(R.id.text_recv);
-        IPMessage msg = new IPMessage();
 
-        user = new User();
-        user.setName("userName");
-        user.setIdentity("1234567890");
-        user.setmPassword("123456789");
-        msg.setBody(UserComposer.composeUser(user));
-        msg.setDate("date");
-        msg.setFrom("name");
-        msg.setTo("host");
-        msg.setMessageIndex(128);
-        msg.setMessageType(Headers.MESSAGE_TYPE_LOGIN);
-        try {
-            Log.e(TAG, "before:" + msg);
-            Log.e(TAG, "before:" + user);
-            byte[] data = MessageComposer.composeMessage(msg);
-            msg = MessageParser.parseMessage(new ByteArrayInputStream(data));
-            Log.e(TAG, "after:" + msg);
-            Log.e(TAG, "after:" + UserParser.parseUser(msg.getBody()));
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        
-        
-        
         btn_login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,16 +56,9 @@ public class MainActivity extends Activity {
                 msg.setMessageIndex(1);
                 msg.setMessageType(Headers.MESSAGE_TYPE_LOGIN);
                 try {
-                    Log.e(TAG, "before:" + msg);
-                    Log.e(TAG, "after:" + MessageParser.parseMessage(new ByteArrayInputStream(MessageComposer.composeMessage(msg))));
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                try {
                     ops.write("abcdefg".getBytes());
                     ops.write(MessageComposer.composeMessage(msg));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     new Thread(mClientThread).start();
                 }
@@ -116,9 +79,9 @@ public class MainActivity extends Activity {
                 msg.setMessageIndex(1);
                 msg.setMessageType(Headers.MESSAGE_TYPE_MESSAGE);
                 try {
-                    ops.write("abcdefg".getBytes());
+//                    ops.write("abcdefg".getBytes()); //noisy data test
                     ops.write(MessageComposer.composeMessage(msg));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     new Thread(mClientThread).start();
                 }
@@ -134,7 +97,7 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             try {
-                InetSocketAddress serverAddr = new InetSocketAddress("10.0.129.209", 8888);
+                InetSocketAddress serverAddr = new InetSocketAddress("192.168.43.58", 8888);
                 Socket s = new Socket();
                 s.connect(serverAddr);
                 ops = s.getOutputStream();
@@ -170,18 +133,11 @@ public class MainActivity extends Activity {
     };
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
     protected void onDestroy() {
         if (ops != null) {
             try {
                 ops.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
