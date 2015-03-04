@@ -1,6 +1,7 @@
 
 package cn.ljj.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +12,7 @@ import cn.ljj.message.Headers;
 import cn.ljj.message.composerparser.MessageComposer;
 import cn.ljj.message.composerparser.MessageParser;
 import cn.ljj.message.composerparser.UserComposer;
+import cn.ljj.message.composerparser.UserParser;
 import cn.ljj.messager.R;
 import cn.ljj.user.User;
 import android.os.Bundle;
@@ -46,17 +48,42 @@ public class MainActivity extends Activity {
                 IPMessage msg = new IPMessage();
                 user = new User();
                 user.setName(editName.getText().toString());
-                user.setIdentity("1234567890");
-                user.setmPassword("123456789");
+                user.setIdentity(1234567);
+                user.setPassword("123456789");
+                user.setStatus(1);
+                try {
+                    Log.e(TAG, "user before=" + user);
+                    Log.e(TAG, "user after=" + UserParser.parseUser(UserComposer.composeUser(user)));
+                } catch (IOException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
+                }
 
-                msg.setBody(UserComposer.composeUser(user));
+                try {
+                    msg.setBody(UserComposer.composeUser(user));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 msg.setDate("date");
-                msg.setFrom(user.getName());
-                msg.setTo("host");
+                msg.setFromName(user.getName());
+                msg.setToName("host");
                 msg.setMessageIndex(1);
                 msg.setMessageType(Headers.MESSAGE_TYPE_LOGIN);
+                msg.setTransactionId(3);
+                msg.setFromId(user.getIdentity());
+                msg.setToId(8888);
+                msg.setMessageId(999);
                 try {
-                    ops.write("abcdefg".getBytes());
+                    Log.e(TAG, "msg before=" + msg);
+                    Log.e(TAG, "msg after="
+                            + MessageParser.parseMessage(
+                                    new ByteArrayInputStream(MessageComposer.composeMessage(msg))));
+                } catch (IOException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
+                }
+                try {
+//                  ops.write("abcdefg".getBytes()); //noisy data test
                     ops.write(MessageComposer.composeMessage(msg));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -74,8 +101,9 @@ public class MainActivity extends Activity {
                 IPMessage msg = new IPMessage();
                 msg.setBody(editContent.getText().toString().getBytes());
                 msg.setDate("date");
-                msg.setFrom(user.getName());
-                msg.setTo(editTo.getText().toString());
+                msg.setFromName(user.getName());
+                msg.setFromId(user.getIdentity());
+                msg.setToName(editTo.getText().toString());
                 msg.setMessageIndex(1);
                 msg.setMessageType(Headers.MESSAGE_TYPE_MESSAGE);
                 try {

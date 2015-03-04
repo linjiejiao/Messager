@@ -22,10 +22,10 @@ public class MessageParser extends BaseParser {
         int length = parseLengthInt(dataStream);
         byte[] messageData = new byte[length];
         data.read(messageData, 0, length);
-        return parserMessage(messageData);
+        return parseMessage(messageData);
     }
 
-    private static IPMessage parserMessage(byte[] data) {
+    private static IPMessage parseMessage(byte[] data) {
         IPMessage msg = null;
         InputStreamReader dataStream = null;
         try {
@@ -40,11 +40,17 @@ public class MessageParser extends BaseParser {
                     case Headers.HEADER_MESSAGE_DATE:
                         msg.setDate(parseString(dataStream));
                         break;
-                    case Headers.HEADER_MESSAGE_FROM:
-                        msg.setFrom(parseString(dataStream));
+                    case Headers.HEADER_MESSAGE_FROM_ID:
+                        msg.setFromId(parseInt(dataStream));
                         break;
-                    case Headers.HEADER_MESSAGE_TO:
-                        msg.setTo(parseString(dataStream));
+                    case Headers.HEADER_MESSAGE_TO_ID:
+                        msg.setToId(parseInt(dataStream));
+                        break;
+                    case Headers.HEADER_MESSAGE_FROM_NAME:
+                        msg.setFromName(parseString(dataStream));
+                        break;
+                    case Headers.HEADER_MESSAGE_TO_NAME:
+                        msg.setToName(parseString(dataStream));
                         break;
                     case Headers.HEADER_MESSAGE_TYPE:
                         msg.setMessageType(parseInt(dataStream));

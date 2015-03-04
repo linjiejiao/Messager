@@ -2,7 +2,6 @@
 package cn.ljj.message.composerparser;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class BaseParser {
 
@@ -17,9 +16,10 @@ public class BaseParser {
     protected static int parseInt(InputStreamReader dataStream) throws IOException {
         byte[] bytes = new byte[4];
         dataStream.read(bytes, 0, 4);
-        int value = -1;
+        int value = 0;
         for (int i = 0; i < 4; i++) {
-            value = (value << 8) | bytes[i];
+            int b = bytes[i] >= 0 ? bytes[i]: bytes[i] + 256 ;
+            value = (value << 8) | b ;
         }
         return value;
     }

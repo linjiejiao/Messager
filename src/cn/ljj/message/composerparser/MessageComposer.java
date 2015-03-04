@@ -11,18 +11,18 @@ public class MessageComposer extends BaseComposer {
 
     public static byte[] composeMessage(IPMessage msg) throws IOException {
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        for(int i : Headers.INT_HEADERS){
+        for (int i : IPMessage.INT_HEADERS) {
             Integer data = getIntData(msg, i);
-            if(data == null){
+            if (data == null) {
                 continue;
             }
             byte[] buffer = composeInt(data);
             bao.write(i);
             bao.write(buffer);
         }
-        for(int i : Headers.STRING_HEADERS){
+        for (int i : IPMessage.STRING_HEADERS) {
             String data = getStringData(msg, i);
-            if(data == null){
+            if (data == null) {
                 continue;
             }
             byte[] buffer = composeString(data);
@@ -30,9 +30,9 @@ public class MessageComposer extends BaseComposer {
             bao.write(getLengthBytes(buffer.length));
             bao.write(buffer);
         }
-        for(int i : Headers.BYTE_HEADERS){
+        for (int i : IPMessage.BYTE_HEADERS) {
             byte[] data = getByteArrayData(msg, i);
-            if(data == null){
+            if (data == null) {
                 continue;
             }
             byte[] buffer = composeByteArray(data);
@@ -51,35 +51,41 @@ public class MessageComposer extends BaseComposer {
         return bao.toByteArray();
     }
 
-    private static byte[] getByteArrayData(IPMessage msg, int type){
+    private static byte[] getByteArrayData(IPMessage msg, int type) {
         byte[] bytes = null;
-        switch(type){
+        switch (type) {
             case Headers.HEADER_MESSAGE_BODY:
                 bytes = msg.getBody();
                 break;
         }
         return bytes;
     }
- 
-    private static String getStringData(IPMessage msg, int type){
+
+    private static String getStringData(IPMessage msg, int type) {
         String str = null;
-        switch(type){
-            case Headers.HEADER_MESSAGE_FROM:
-                str = msg.getFrom();
-                break;
-            case Headers.HEADER_MESSAGE_TO:
-                str = msg.getTo();
-                break;
+        switch (type) {
             case Headers.HEADER_MESSAGE_DATE:
                 str = msg.getDate();
+                break;
+            case Headers.HEADER_MESSAGE_FROM_NAME:
+                str = msg.getFromName();
+                break;
+            case Headers.HEADER_MESSAGE_TO_NAME:
+                str = msg.getToName();
                 break;
         }
         return str;
     }
-    
-    private static Integer getIntData(IPMessage msg, int type){
+
+    private static Integer getIntData(IPMessage msg, int type) {
         Integer i = null;
-        switch(type){
+        switch (type) {
+            case Headers.HEADER_MESSAGE_FROM_ID:
+                i = msg.getFromId();
+                break;
+            case Headers.HEADER_MESSAGE_TO_ID:
+                i = msg.getToId();
+                break;
             case Headers.HEADER_TRANSACTION_ID:
                 i = msg.getTransactionId();
                 break;
