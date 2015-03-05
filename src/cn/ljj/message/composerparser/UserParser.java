@@ -5,7 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import cn.ljj.message.Headers;
-import cn.ljj.user.User;
+import cn.ljj.message.User;
 
 public class UserParser extends BaseParser {
     public static User parseUser(byte[] data) {

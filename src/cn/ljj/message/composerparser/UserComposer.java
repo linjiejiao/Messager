@@ -4,7 +4,7 @@ package cn.ljj.message.composerparser;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import cn.ljj.message.Headers;
-import cn.ljj.user.User;
+import cn.ljj.message.User;
 
 public class UserComposer extends BaseComposer {
 

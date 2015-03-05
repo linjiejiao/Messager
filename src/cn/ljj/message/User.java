@@ -1,7 +1,6 @@
 
-package cn.ljj.user;
+package cn.ljj.message;
 
-import cn.ljj.message.Headers;
 
 public class User {
     private String mName = null;
