@@ -6,16 +6,16 @@ import java.util.Arrays;
 public class IPMessage {
     public static final String TAG = "IPMessage";
 
-    private int mFromId;
-    private int mToId;
-    private String mFromName;
-    private String mToName;
-    private String mDate;
-    private int mMessageType;
-    private int mMessageIndex;
-    private int mMessageId;
-    private int mTransactionId;
-    private byte[] mBody;
+    private int mFromId = 0;
+    private int mToId = 0;
+    private String mFromName = null;
+    private String mToName = null;
+    private String mDate = null;
+    private int mMessageType = Headers.MESSAGE_TYPE_BASE;
+    private int mMessageIndex = -1;
+    private int mMessageId = -1;
+    private int mTransactionId = 0;
+    private byte[] mBody = null;
 
     public int getFromId() {
         return mFromId;

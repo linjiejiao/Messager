@@ -4,10 +4,10 @@ package cn.ljj.user;
 import cn.ljj.message.Headers;
 
 public class User {
-    private String mName;
-    private String mPassword;
-    private int mIdentity;
-    private int mStatus;
+    private String mName = null;
+    private String mPassword = null;
+    private int mIdentity = 0;
+    private int mStatus = 0;
 
     public String getName() {
         return mName;
