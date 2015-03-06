@@ -8,6 +8,9 @@ public class User {
     private int mIdentity = 0;
     private int mStatus = 0;
 
+    public static final int STATUS_OFF_LINE = 0;
+    public static final int STATUS_ON_LINE = 1;
+
     public String getName() {
         return mName;
     }
@@ -38,6 +41,18 @@ public class User {
 
     public void setStatus(int status) {
         mStatus = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof User){
+            User other = (User)o;
+            if(mIdentity == other.mIdentity && mPassword.equals(other.mPassword)
+                    && mName.equals(other.mName)){
+                return true;
+            }
+        }
+        return super.equals(o);
     }
 
     @Override

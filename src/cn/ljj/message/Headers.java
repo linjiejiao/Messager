@@ -29,14 +29,6 @@ public class Headers {
     // The name of the target user
     public static final int HEADER_MESSAGE_TO_NAME = MESSAGE_HEADER_BASE + 0x0a;
 
-    public static final int MESSAGE_TYPE_BASE = 0x60;
-    // Normal message type. Contains from, to, date, body, index
-    public static final int MESSAGE_TYPE_MESSAGE = MESSAGE_TYPE_BASE + 0x01;
-    // Respon message type. Body may be excluded.
-    public static final int MESSAGE_TYPE_RESPOND = MESSAGE_TYPE_BASE + 0x02;
-    // Log in message the user info will be place on the body
-    public static final int MESSAGE_TYPE_LOGIN = MESSAGE_TYPE_BASE + 0x03;
-
     public static final int USER_HEADER_BASE = 0x80;
     // User Name
     public static final int HEADER_USER_NAME = USER_HEADER_BASE + 0x01;

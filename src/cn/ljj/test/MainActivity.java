@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
                 msg.setFromName(user.getName());
                 msg.setToName("host");
                 msg.setMessageIndex(1);
-                msg.setMessageType(Headers.MESSAGE_TYPE_LOGIN);
+                msg.setMessageType(IPMessage.MESSAGE_TYPE_LOGIN);
                 msg.setTransactionId(3);
                 msg.setFromId(user.getIdentity());
                 msg.setToId(8888);
@@ -105,7 +105,7 @@ public class MainActivity extends Activity {
                 msg.setFromId(user.getIdentity());
                 msg.setToName(editTo.getText().toString());
                 msg.setMessageIndex(1);
-                msg.setMessageType(Headers.MESSAGE_TYPE_MESSAGE);
+                msg.setMessageType(IPMessage.MESSAGE_TYPE_MESSAGE);
                 try {
 //                    ops.write("abcdefg".getBytes()); //noisy data test
                     ops.write(MessageComposer.composeMessage(msg));

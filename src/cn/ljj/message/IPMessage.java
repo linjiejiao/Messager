@@ -6,12 +6,20 @@ import java.util.Arrays;
 public class IPMessage {
     public static final String TAG = "IPMessage";
 
+    public static final int MESSAGE_TYPE_NONE = 0;
+    // Normal message type. Contains from, to, date, body, index
+    public static final int MESSAGE_TYPE_MESSAGE = 1;
+    // Respon message type. Body may be excluded.
+    public static final int MESSAGE_TYPE_RESPOND = 2;
+    // Log in message the user info will be place on the body
+    public static final int MESSAGE_TYPE_LOGIN = 3;
+
     private int mFromId = 0;
     private int mToId = 0;
     private String mFromName = null;
     private String mToName = null;
     private String mDate = null;
-    private int mMessageType = Headers.MESSAGE_TYPE_BASE;
+    private int mMessageType = MESSAGE_TYPE_NONE;
     private int mMessageIndex = -1;
     private int mMessageId = -1;
     private int mTransactionId = 0;
