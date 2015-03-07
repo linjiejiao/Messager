@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         Button btn_login = (Button) findViewById(R.id.btn_login);
         editName = (EditText) findViewById(R.id.edit_name);
         editContent = (EditText) findViewById(R.id.edit_msg);
-        editTo = (EditText) findViewById(R.id.edit_to);
+        editTo = (EditText) findViewById(R.id.edit_msg);
         textRecv = (TextView) findViewById(R.id.text_recv);
         editName.setText("name_123");
         editTo.setText("456");

@@ -1,19 +1,105 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10sp" >
 
-    <EditText
-        android:id="@+id/edit_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="name" />
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal" >
 
-    <Button
-        android:id="@+id/btn_login"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID:" />
+
+        <EditText
+            android:id="@+id/edit_id"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:hint="name" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PW:" />
+
+        <EditText
+            android:id="@+id/edit_name"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:hint="name" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="login" />
+        android:layout_marginBottom="10sp"
+        android:layout_marginTop="10sp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_default"
+            android:text="login" />
+
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_default"
+            android:text="logout" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/edit_text"
+        android:orientation="horizontal"
+        android:paddingBottom="10sp"
+        android:paddingTop="10sp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Pick a user: " />
+
+        <Spinner
+            android:id="@+id/spinner_user"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_marginTop="8sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="receive:" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="20sp"
+        android:layout_weight="1"
+        android:background="@android:drawable/edit_text" >
+
+        <TextView
+            android:id="@+id/text_recv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="aijfoaihfoahs\n\r\n\r\n\aar\\n\r\n\r\n\r\\n\r\n\r\n\r\\n\r\n\r\n\r\ofhaofhoafoiashfioahfoihasoi\n\r\n\r\n\r\n\\n\r\n\r\n\r\\n\r\n\r\n\r\\n\r\n\r\n\r\r\3rwetwetwetwtw\n\n\n" />
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,28 +109,20 @@
         <EditText
             android:id="@+id/edit_msg"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background_normal"
             android:hint="content" />
 
-        <EditText
-            android:id="@+id/edit_to"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="to" />
+            android:layout_gravity="center"
+            android:layout_margin="5sp"
+            android:background="@android:drawable/btn_default"
+            android:text="send" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btn_send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="send" />
-
-    <TextView
-        android:id="@+id/text_recv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="recv:" />
 
 </LinearLayout>
