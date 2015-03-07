@@ -31,6 +31,14 @@ public class UserComposer extends BaseComposer {
         }
         byte[] data = bao.toByteArray();
         bao.close();
+        // header for whole user
+        bao = new ByteArrayOutputStream();
+        bao.write(Headers.HEADER_USER_BEGIN);
+        bao.write(getLengthBytes(data.length + 1)); // 1 is for Headers.HEADER_USER_END
+        bao.write(data);
+        bao.write(Headers.HEADER_USER_END);
+        data = bao.toByteArray();
+        bao.close();
         return data;
     }
 

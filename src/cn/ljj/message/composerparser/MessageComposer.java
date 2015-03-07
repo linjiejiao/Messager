@@ -45,10 +45,12 @@ public class MessageComposer extends BaseComposer {
         // header for whole message
         bao = new ByteArrayOutputStream();
         bao.write(Headers.MESSAGE_BEGIN);
-        bao.write(getLengthBytes(data.length + 1)); // Headers.MESSAGE_END
+        bao.write(getLengthBytes(data.length + 1)); // i is for Headers.MESSAGE_END
         bao.write(data);
         bao.write(Headers.MESSAGE_END);
-        return bao.toByteArray();
+        data = bao.toByteArray();
+        bao.close();
+        return data;
     }
 
     private static byte[] getByteArrayData(IPMessage msg, int type) {

@@ -29,14 +29,18 @@ public class Headers {
     // The name of the target user
     public static final int HEADER_MESSAGE_TO_NAME = MESSAGE_HEADER_BASE + 0x0a;
 
-    public static final int USER_HEADER_BASE = 0x80;
+    public static final byte USER_HEADER_BASE = (byte) 0x80;
+    // User Begin
+    public static final byte HEADER_USER_BEGIN = USER_HEADER_BASE;
     // User Name
-    public static final int HEADER_USER_NAME = USER_HEADER_BASE + 0x01;
+    public static final byte HEADER_USER_NAME = USER_HEADER_BASE + 0x01;
     // User Identity
-    public static final int HEADER_USER_IDENTITY = USER_HEADER_BASE + 0x02;
+    public static final byte HEADER_USER_IDENTITY = USER_HEADER_BASE + 0x02;
     // User Password
-    public static final int HEADER_USER_PASSWORD = USER_HEADER_BASE + 0x03;
+    public static final byte HEADER_USER_PASSWORD = USER_HEADER_BASE + 0x03;
     // User Password
-    public static final int HEADER_USER_STATUS= USER_HEADER_BASE + 0x04;
+    public static final byte HEADER_USER_STATUS = USER_HEADER_BASE + 0x04;
+    // User End
+    public static final byte HEADER_USER_END = USER_HEADER_BASE + 0x05;
 
 }

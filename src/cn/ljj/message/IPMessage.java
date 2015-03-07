@@ -13,6 +13,10 @@ public class IPMessage {
     public static final int MESSAGE_TYPE_RESPOND = 2;
     // Log in message the user info will be place on the body
     public static final int MESSAGE_TYPE_LOGIN = 3;
+    // Change status
+    public static final int MESSAGE_TYPE_CHANGE_STATUS= 4;
+    // Get the user list from the server
+    public static final int MESSAGE_TYPE_GET_USERS = 5;
 
     private int mFromId = 0;
     private int mToId = 0;

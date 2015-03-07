@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import cn.ljj.message.IPMessage;
-import cn.ljj.message.Headers;
 import cn.ljj.message.User;
 import cn.ljj.message.composerparser.MessageComposer;
 import cn.ljj.message.composerparser.MessageParser;
@@ -41,16 +40,17 @@ public class MainActivity extends Activity {
         editContent = (EditText) findViewById(R.id.edit_msg);
         editTo = (EditText) findViewById(R.id.edit_to);
         textRecv = (TextView) findViewById(R.id.text_recv);
-
+        editName.setText("name_123");
+        editTo.setText("456");
         btn_login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 IPMessage msg = new IPMessage();
                 user = new User();
                 user.setName(editName.getText().toString());
-                user.setIdentity(1234567);
-                user.setPassword("123456789");
-                user.setStatus(1);
+                user.setIdentity(123);
+                user.setPassword("123");
+                user.setStatus(User.STATUS_ON_LINE);
                 try {
                     Log.e(TAG, "user before=" + user);
                     Log.e(TAG, "user after=" + UserParser.parseUser(UserComposer.composeUser(user)));
@@ -64,14 +64,15 @@ public class MainActivity extends Activity {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                msg.setDate("date");
+                
+                msg.setDate(System.currentTimeMillis() + "");
                 msg.setFromName(user.getName());
-                msg.setToName("host");
+                msg.setToName("123");
                 msg.setMessageIndex(1);
                 msg.setMessageType(IPMessage.MESSAGE_TYPE_LOGIN);
                 msg.setTransactionId(3);
                 msg.setFromId(user.getIdentity());
-                msg.setToId(8888);
+//                msg.setToId(123);
                 msg.setMessageId(999);
                 try {
                     Log.e(TAG, "msg before=" + msg);
@@ -100,12 +101,14 @@ public class MainActivity extends Activity {
                 }
                 IPMessage msg = new IPMessage();
                 msg.setBody(editContent.getText().toString().getBytes());
-                msg.setDate("date");
+                msg.setDate(System.currentTimeMillis() + "");
                 msg.setFromName(user.getName());
                 msg.setFromId(user.getIdentity());
-                msg.setToName(editTo.getText().toString());
+                String to = editTo.getText().toString();
+                msg.setToName(to);
+                msg.setToId(Integer.parseInt(to));
                 msg.setMessageIndex(1);
-                msg.setMessageType(IPMessage.MESSAGE_TYPE_MESSAGE);
+                msg.setMessageType(IPMessage.MESSAGE_TYPE_GET_USERS);
                 try {
 //                    ops.write("abcdefg".getBytes()); //noisy data test
                     ops.write(MessageComposer.composeMessage(msg));
@@ -125,7 +128,7 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             try {
-                InetSocketAddress serverAddr = new InetSocketAddress("192.168.43.58", 8888);
+                InetSocketAddress serverAddr = new InetSocketAddress("192.168.1.113", 8888);
                 Socket s = new Socket();
                 s.connect(serverAddr);
                 ops = s.getOutputStream();
@@ -145,13 +148,20 @@ public class MainActivity extends Activity {
                 while (true) {
                     IPMessage msg = MessageParser.parseMessage(ips);
                     if(msg != null){
-                        final String content = new String(msg.getBody());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textRecv.setText(textRecv.getText() + "\r\n" + content);
-                            }
-                        });
+                        switch(msg.getMessageType()){
+                            case IPMessage.MESSAGE_TYPE_GET_USERS:
+                                Log.e(TAG, "get All user :" + UserParser.parseUsers(msg.getBody()));
+                                break;
+                            case IPMessage.MESSAGE_TYPE_MESSAGE:
+                                final String content = new String(msg.getBody());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        textRecv.setText(textRecv.getText() + "\r\n" + content);
+                                    }
+                                });
+                                break;
+                        }
                     }
                 }
             } catch (Exception e) {
