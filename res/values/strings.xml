@@ -2,7 +2,15 @@
 <resources>
 
     <string name="app_name">Messager</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="str_id">ID:</string>
+    <string name="str_pw">PW:</string>
+    <string name="str_id_hint">User Id</string>
+    <string name="str_pw_hint">Password</string>
+    <string name="str_login">Login</string>
+    <string name="str_logout">Logout</string>
+    <string name="str_pick_user">Pick a user: </string>
+    <string name="str_receive">Receive: </string>
+    <string name="str_content">content</string>
+    <string name="str_send">Send</string>
 
 </resources>

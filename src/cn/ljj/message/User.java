@@ -47,8 +47,7 @@ public class User {
     public boolean equals(Object o) {
         if(o instanceof User){
             User other = (User)o;
-            if(mIdentity == other.mIdentity && mPassword.equals(other.mPassword)
-                    && mName.equals(other.mName)){
+            if(mIdentity == other.mIdentity && mPassword.equals(other.mPassword)){
                 return true;
             }
         }

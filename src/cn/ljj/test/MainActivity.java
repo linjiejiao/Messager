@@ -1,186 +1,242 @@
 
 package cn.ljj.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.util.List;
+
 import cn.ljj.message.IPMessage;
 import cn.ljj.message.User;
-import cn.ljj.message.composerparser.MessageComposer;
-import cn.ljj.message.composerparser.MessageParser;
 import cn.ljj.message.composerparser.UserComposer;
 import cn.ljj.message.composerparser.UserParser;
 import cn.ljj.messager.R;
+import cn.ljj.test.ConnectionThread.IMessageReceived;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
-    protected String TAG = "MainActivity";
-    EditText editName;
-    EditText editContent;
-    EditText editTo;
-    TextView textRecv;
-    User user;
+public class MainActivity extends Activity implements OnClickListener, OnItemSelectedListener, IMessageReceived {
+    public String TAG = "MainActivity";
+    private EditText editLoginId = null;
+    private EditText editLoginPassword = null;
+    private EditText editContent = null;
+    private TextView textRecv = null;
+    private User mLocalUser = new User();
+    private User mTargetUser = null;
+    private Button btnLogin = null;
+    private Button btnLogout = null;
+    private Button btnSend = null;
+    private Spinner mUserChosser = null;
+    private UserAdapter mAdapter = null;
+    private ConnectionThread mConnectionThread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button btn_login = (Button) findViewById(R.id.btn_login);
-        editName = (EditText) findViewById(R.id.edit_name);
+        btnLogin = (Button) findViewById(R.id.btn_login);
+        btnLogout = (Button) findViewById(R.id.btn_logout);
+        btnSend = (Button) findViewById(R.id.btn_send);
+
+        editLoginId = (EditText) findViewById(R.id.edit_id);
+        editLoginPassword = (EditText) findViewById(R.id.edit_password);
         editContent = (EditText) findViewById(R.id.edit_msg);
-        editTo = (EditText) findViewById(R.id.edit_msg);
         textRecv = (TextView) findViewById(R.id.text_recv);
-        editName.setText("name_123");
-        editTo.setText("456");
-        btn_login.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IPMessage msg = new IPMessage();
-                user = new User();
-                user.setName(editName.getText().toString());
-                user.setIdentity(123);
-                user.setPassword("123");
-                user.setStatus(User.STATUS_ON_LINE);
-                try {
-                    Log.e(TAG, "user before=" + user);
-                    Log.e(TAG, "user after=" + UserParser.parseUser(UserComposer.composeUser(user)));
-                } catch (IOException e2) {
-                    // TODO Auto-generated catch block
-                    e2.printStackTrace();
-                }
+        mUserChosser = (Spinner) findViewById(R.id.spinner_user);
+        editLoginId.setText("123");
+        editLoginPassword.setText("123");
+        editContent.setText("content");
 
-                try {
-                    msg.setBody(UserComposer.composeUser(user));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                
-                msg.setDate(System.currentTimeMillis() + "");
-                msg.setFromName(user.getName());
-                msg.setToName("123");
-                msg.setMessageIndex(1);
-                msg.setMessageType(IPMessage.MESSAGE_TYPE_LOGIN);
-                msg.setTransactionId(3);
-                msg.setFromId(user.getIdentity());
-//                msg.setToId(123);
-                msg.setMessageId(999);
-                try {
-                    Log.e(TAG, "msg before=" + msg);
-                    Log.e(TAG, "msg after="
-                            + MessageParser.parseMessage(
-                                    new ByteArrayInputStream(MessageComposer.composeMessage(msg))));
-                } catch (IOException e2) {
-                    // TODO Auto-generated catch block
-                    e2.printStackTrace();
-                }
-                try {
-//                  ops.write("abcdefg".getBytes()); //noisy data test
-                    ops.write(MessageComposer.composeMessage(msg));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    new Thread(mClientThread).start();
-                }
-            }
-        });
-        Button btn_send = (Button) findViewById(R.id.btn_send);
-        btn_send.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (user == null) {
-                    return;
-                }
-                IPMessage msg = new IPMessage();
-                msg.setBody(editContent.getText().toString().getBytes());
-                msg.setDate(System.currentTimeMillis() + "");
-                msg.setFromName(user.getName());
-                msg.setFromId(user.getIdentity());
-                String to = editTo.getText().toString();
-                msg.setToName(to);
-                msg.setToId(Integer.parseInt(to));
-                msg.setMessageIndex(1);
-                msg.setMessageType(IPMessage.MESSAGE_TYPE_GET_USERS);
-                try {
-//                    ops.write("abcdefg".getBytes()); //noisy data test
-                    ops.write(MessageComposer.composeMessage(msg));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    new Thread(mClientThread).start();
-                }
-            }
-        });
-        new Thread(mClientThread).start();
+        mUserChosser.setOnItemSelectedListener(this);
+        mAdapter = new UserAdapter(null, this);
+        mUserChosser.setAdapter(mAdapter);
+
+        btnLogin.setOnClickListener(this);
+        btnSend.setOnClickListener(this);
+        btnLogout.setOnClickListener(this);
+        updateViews(false);
     }
-
-    OutputStream ops = null;
-    InputStream ips = null;
-    Runnable mClientThread = new Runnable() {
-
-        @Override
-        public void run() {
-            try {
-                InetSocketAddress serverAddr = new InetSocketAddress("192.168.1.113", 8888);
-                Socket s = new Socket();
-                s.connect(serverAddr);
-                ops = s.getOutputStream();
-                ips = s.getInputStream();
-                new Thread(mReceiverThread).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    Runnable mReceiverThread = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                Log.e(TAG, "ReceiverThread run");
-                while (true) {
-                    IPMessage msg = MessageParser.parseMessage(ips);
-                    if(msg != null){
-                        switch(msg.getMessageType()){
-                            case IPMessage.MESSAGE_TYPE_GET_USERS:
-                                Log.e(TAG, "get All user :" + UserParser.parseUsers(msg.getBody()));
-                                break;
-                            case IPMessage.MESSAGE_TYPE_MESSAGE:
-                                final String content = new String(msg.getBody());
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        textRecv.setText(textRecv.getText() + "\r\n" + content);
-                                    }
-                                });
-                                break;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
     @Override
-    protected void onDestroy() {
-        if (ops != null) {
-            try {
-                ops.close();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.btn_login:
+                mConnectionThread = new ConnectionThread();
+                mConnectionThread.start();
+                mConnectionThread.setMessageRecvCallback(this);
+                IPMessage msg = getLoginMessage();
+                mConnectionThread.sendMessage(msg);
+                break;
+            case R.id.btn_logout:
+                logout();
+                break;
+            case R.id.btn_send:
+                sendContent();
+                break;
         }
-        super.onDestroy();
     }
 
+    private void logout(){
+        mConnectionThread.sendMessage(getLogoutMessage());
+        mConnectionThread.quit();
+        updateViews(false);
+    }
+    private void sendContent(){
+        IPMessage msg = new IPMessage();
+        msg.setBody(editContent.getText().toString().getBytes());
+        msg.setDate(""+System.currentTimeMillis());
+        msg.setFromName(mLocalUser.getName());
+        msg.setToName(mTargetUser.getName());
+        msg.setMessageIndex(0);
+        msg.setMessageType(IPMessage.MESSAGE_TYPE_MESSAGE);
+        msg.setTransactionId(0);
+        msg.setFromId(mLocalUser.getIdentity());
+        msg.setToId(mTargetUser.getIdentity());
+        msg.setMessageId(0);
+        mConnectionThread.sendMessage(msg);
+    }
+ 
+    private void getAllUsers(){
+        IPMessage msg = new IPMessage();
+        msg.setDate(System.currentTimeMillis() + "");
+        msg.setMessageType(IPMessage.MESSAGE_TYPE_GET_USERS);
+        mConnectionThread.sendMessage(msg);
+    }
+    
+    @Override
+    public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
+        mTargetUser = (User) mAdapter.getItem(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapter) {
+
+    }
+
+    private IPMessage getLoginMessage() {
+        String id = editLoginId.getText().toString();
+        mLocalUser.setName(id);
+        mLocalUser.setIdentity(Integer.parseInt(id));
+        mLocalUser.setPassword(editLoginPassword.getText().toString());
+        mLocalUser.setStatus(User.STATUS_ON_LINE);
+        IPMessage msg = null;
+        try {
+            msg = new IPMessage();
+            msg.setBody(UserComposer.composeUser(mLocalUser));
+            msg.setDate(System.currentTimeMillis() + "");
+            msg.setMessageType(IPMessage.MESSAGE_TYPE_LOGIN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return msg;
+    }
+
+    private IPMessage getLogoutMessage() {
+        String id = editLoginId.getText().toString();
+        mLocalUser.setName(id);
+        mLocalUser.setIdentity(Integer.parseInt(id));
+        mLocalUser.setPassword(editLoginPassword.getText().toString());
+        mLocalUser.setStatus(User.STATUS_OFF_LINE);
+        IPMessage msg = null;
+        try {
+            msg = new IPMessage();
+            msg.setBody(UserComposer.composeUser(mLocalUser));
+            msg.setDate(System.currentTimeMillis() + "");
+            msg.setMessageType(IPMessage.MESSAGE_TYPE_CHANGE_STATUS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return msg;
+    }
+
+    @Override
+    public void onMessageReceived(IPMessage msg) {
+        handleIncomeMessage(msg);
+    }
+    
+    private void handleIncomeMessage(final IPMessage msg){
+        if (msg != null) {
+            switch (msg.getMessageType()) {
+                case IPMessage.MESSAGE_TYPE_GET_USERS:
+                    final List<User> users = UserParser.parseUsers(msg.getBody());
+                    Log.e(TAG, "get All user :" + users);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.setDataAndNotify(users);
+                        }
+                    });
+                    break;
+                case IPMessage.MESSAGE_TYPE_MESSAGE:
+                    final String content = new String(msg.getBody());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            textRecv.setText(msg.getFromName() + ": " + content + "\r\n" + textRecv.getText());
+                        }
+                    });
+                    break;
+                case IPMessage.MESSAGE_TYPE_RESPOND:
+                    final String respon = new String(msg.getBody());
+                    if("LOGIN_OK".equals(respon)){
+                        getAllUsers();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateViews(true);
+                            }
+                        });
+//                    }else if("CHANGE_STATUS_OK".equals(respon)){
+//                        
+                    }else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textRecv.setText(respon + "\r\n" + textRecv.getText());
+                            }
+                        });
+                    }
+                    break;
+                case IPMessage.MESSAGE_TYPE_CONNECTION_ERROR:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            
+                        }
+                    });
+                    break;
+            }
+        }else{
+            mConnectionThread.sendMessage(getLogoutMessage());
+            mConnectionThread.quit();
+        }
+    }
+    
+    private void updateViews(boolean hadLogin){
+        if(hadLogin){
+            btnLogin.setEnabled(false);
+            btnLogout.setEnabled(true);
+            btnSend.setEnabled(true);
+            editLoginId.setEnabled(false);
+            editLoginPassword.setEnabled(false);
+            editContent.setEnabled(true);
+            mUserChosser.setEnabled(true);
+        }else{
+            btnLogin.setEnabled(true);
+            btnLogout.setEnabled(false);
+            btnSend.setEnabled(false);
+            editLoginId.setEnabled(true);
+            editLoginPassword.setEnabled(true);
+            editContent.setEnabled(false);
+            mUserChosser.setEnabled(false);
+        }
+    }
 }

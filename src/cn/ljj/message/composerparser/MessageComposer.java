@@ -9,48 +9,59 @@ import cn.ljj.message.Headers;
 
 public class MessageComposer extends BaseComposer {
 
-    public static byte[] composeMessage(IPMessage msg) throws IOException {
-        ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        for (int i : IPMessage.INT_HEADERS) {
-            Integer data = getIntData(msg, i);
-            if (data == null) {
-                continue;
+    public static byte[] composeMessage(IPMessage msg){
+        byte[] composeData = new byte[0];
+        ByteArrayOutputStream bao = null;
+        try {
+            bao = new ByteArrayOutputStream();
+            for (int i : IPMessage.INT_HEADERS) {
+                Integer data = getIntData(msg, i);
+                if (data == null) {
+                    continue;
+                }
+                byte[] buffer = composeInt(data);
+                bao.write(i);
+                bao.write(buffer);
             }
-            byte[] buffer = composeInt(data);
-            bao.write(i);
-            bao.write(buffer);
-        }
-        for (int i : IPMessage.STRING_HEADERS) {
-            String data = getStringData(msg, i);
-            if (data == null) {
-                continue;
+            for (int i : IPMessage.STRING_HEADERS) {
+                String data = getStringData(msg, i);
+                if (data == null) {
+                    continue;
+                }
+                byte[] buffer = composeString(data);
+                bao.write(i);
+                bao.write(getLengthBytes(buffer.length));
+                bao.write(buffer);
             }
-            byte[] buffer = composeString(data);
-            bao.write(i);
-            bao.write(getLengthBytes(buffer.length));
-            bao.write(buffer);
-        }
-        for (int i : IPMessage.BYTE_HEADERS) {
-            byte[] data = getByteArrayData(msg, i);
-            if (data == null) {
-                continue;
+            for (int i : IPMessage.BYTE_HEADERS) {
+                byte[] data = getByteArrayData(msg, i);
+                if (data == null) {
+                    continue;
+                }
+                byte[] buffer = composeByteArray(data);
+                bao.write(i);
+                bao.write(getLengthBytes(buffer.length));
+                bao.write(buffer);
             }
-            byte[] buffer = composeByteArray(data);
-            bao.write(i);
-            bao.write(getLengthBytes(buffer.length));
-            bao.write(buffer);
+            byte[] msgData = bao.toByteArray();
+            bao.close();
+            // header for whole message
+            bao = new ByteArrayOutputStream();
+            bao.write(Headers.MESSAGE_BEGIN);
+            bao.write(getLengthBytes(msgData.length + 1)); // i is for Headers.MESSAGE_END
+            bao.write(msgData);
+            bao.write(Headers.MESSAGE_END);
+            composeData = bao.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+                try {
+                    bao.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         }
-        byte[] data = bao.toByteArray();
-        bao.close();
-        // header for whole message
-        bao = new ByteArrayOutputStream();
-        bao.write(Headers.MESSAGE_BEGIN);
-        bao.write(getLengthBytes(data.length + 1)); // i is for Headers.MESSAGE_END
-        bao.write(data);
-        bao.write(Headers.MESSAGE_END);
-        data = bao.toByteArray();
-        bao.close();
-        return data;
+        return composeData;
     }
 
     private static byte[] getByteArrayData(IPMessage msg, int type) {

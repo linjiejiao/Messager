@@ -9,20 +9,28 @@ import cn.ljj.message.Headers;
 
 public class MessageParser extends BaseParser {
 
-    public static IPMessage parseMessage(InputStream data) throws IOException {
-        InputStreamReader dataStream = new InputStreamReader(data);
-        byte b = (byte) dataStream.read();
-        while (b != Headers.MESSAGE_BEGIN) {
-            System.out.println("parseMessage skip byte: " + b);
-            b = (byte) dataStream.read();
-            if (b == -1) {// reach stream end
-                throw new IOException("Reach the end of the stream");
+    public static IPMessage parseMessage(InputStream data) {
+        IPMessage msg = null;
+        try {
+            InputStreamReader dataStream = new InputStreamReader(data);
+            byte b = (byte) dataStream.read();
+            while (b != Headers.MESSAGE_BEGIN) {
+                System.out.println("parseMessage skip byte: " + b);
+                b = (byte) dataStream.read();
+                if (b == -1) {// reach stream end
+                    msg = new IPMessage();
+                    msg.setMessageType(IPMessage.MESSAGE_TYPE_CONNECTION_ERROR);
+                    return msg;
+                }
             }
+            int length = parseLengthInt(dataStream);
+            byte[] messageData = new byte[length];
+            data.read(messageData, 0, length);
+            msg = parseMessage(messageData);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        int length = parseLengthInt(dataStream);
-        byte[] messageData = new byte[length];
-        data.read(messageData, 0, length);
-        return parseMessage(messageData);
+        return msg;
     }
 
     private static IPMessage parseMessage(byte[] data) {
@@ -72,6 +80,7 @@ public class MessageParser extends BaseParser {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            msg = null;
         } finally {
             if (dataStream != null) {
                 dataStream.close();

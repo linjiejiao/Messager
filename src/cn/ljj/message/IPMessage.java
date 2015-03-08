@@ -17,6 +17,8 @@ public class IPMessage {
     public static final int MESSAGE_TYPE_CHANGE_STATUS= 4;
     // Get the user list from the server
     public static final int MESSAGE_TYPE_GET_USERS = 5;
+    // Get the user list from the server
+    public static final int MESSAGE_TYPE_CONNECTION_ERROR = 6;
 
     private int mFromId = 0;
     private int mToId = 0;
