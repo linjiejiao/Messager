@@ -19,6 +19,7 @@ public class MessageParser extends BaseParser {
                 b = (byte) dataStream.read();
                 if (b == -1) {// reach stream end
                     msg = new IPMessage();
+                    msg.setBody("CONNECTION_BROKED".getBytes());
                     msg.setMessageType(IPMessage.MESSAGE_TYPE_CONNECTION_ERROR);
                     return msg;
                 }
@@ -29,6 +30,9 @@ public class MessageParser extends BaseParser {
             msg = parseMessage(messageData);
         } catch (IOException e) {
             e.printStackTrace();
+            msg = new IPMessage();
+            msg.setBody("CONNECTION_BROKED".getBytes());
+            msg.setMessageType(IPMessage.MESSAGE_TYPE_CONNECTION_ERROR);
         }
         return msg;
     }
